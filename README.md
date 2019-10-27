@@ -13,6 +13,8 @@
 ### cmake
 
 ```bash
+git clone https://github.com/PinkD/ipt2socks
+cd ipt2socks
 mkdir build && cd build
 cmake ..
 make
@@ -25,12 +27,12 @@ make
 适用于本地编译，使用包管理器安装 [libuv](https://github.com/libuv/libuv) 依赖库即可（如 `yum install libuv-devel`）：
 
 ```bash
-git clone https://github.com/zfl9/ipt2socks
+git clone https://github.com/PinkD/ipt2socks
 cd ipt2socks
 make && sudo make install
 ```
 
-ipt2socks 默认安装到 `/usr/local/bin/ipt2socks`，可安装到其它目录，如 `make install DESTDIR=/opt/local/bin`。
+ipt2socks 默认安装到 `/usr/bin/ipt2socks`，可安装到其它目录，如 `make install DESTDIR=/opt/local/bin`。
 
 
 #### 静态链接 libuv
@@ -54,7 +56,7 @@ make && sudo make install
 cd ..
 
 # 获取 ipt2socks 源码
-git clone https://github.com/zfl9/ipt2socks
+git clone https://github.com/PinkD/ipt2socks
 
 # 进入源码目录，编译
 cd ipt2socks
@@ -124,8 +126,11 @@ Usage: ipt2socks <options...>. the existing options are as follows:
 -h 选项打印 ipt2socks 的帮助信息，然后退出 ipt2socks 进程
 ```
 
-**以普通用户运行 ipt2socks**
-- `sudo setcap cap_net_bind_service,cap_net_admin+ep /usr/local/bin/ipt2socks`
+### 以普通用户运行 ipt2socks
+
+- `sudo setcap cap_net_bind_service,cap_net_admin+ep /usr/bin/ipt2socks`
 - 如果以 root 用户启动 ipt2socks，也可以指定 `-u nobody` 选项切换至 `nobody` 用户
+
+> 注：使用systemd启动的服务将自动使用nobody用户启动程序
 
 Enjoy it!

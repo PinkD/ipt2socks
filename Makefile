@@ -6,7 +6,7 @@ LIBS = -luv
 SRCS = ipt2socks.c lrucache.c netutils.c
 OBJS = $(SRCS:.c=.o)
 MAIN = ipt2socks
-DESTDIR = /usr/local/bin
+DESTDIR = /usr/bin
 
 .PHONY: all install clean
 
