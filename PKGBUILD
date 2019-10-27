@@ -16,7 +16,7 @@ md5sums=('SKIP')
 
 build() {
   cd "$pkgname"
-  mkdir build && cd build
+  mkdir -p build && cd build
   cmake ..
   make
   mv ipt2socks ../
