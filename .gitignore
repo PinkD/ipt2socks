@@ -2,3 +2,5 @@
 *.gch
 a.out
 ipt2socks
+.idea/
+cmake-build-debug/

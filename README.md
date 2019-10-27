@@ -8,15 +8,35 @@
 - 多线程 + SO_REUSEPORT 端口重用，每个线程运行各自独立的事件循环，性能提升显著。
 
 ## 如何编译
-**动态链接 libuv**：适用于本地编译，使用包管理器安装 [libuv](https://github.com/libuv/libuv) 依赖库即可（如 `yum install libuv-devel`）：
+
+
+### cmake
+
+```bash
+mkdir build && cd build
+cmake ..
+make
+```
+
+### Makefile
+
+#### 动态链接 libuv
+
+适用于本地编译，使用包管理器安装 [libuv](https://github.com/libuv/libuv) 依赖库即可（如 `yum install libuv-devel`）：
+
 ```bash
 git clone https://github.com/zfl9/ipt2socks
 cd ipt2socks
 make && sudo make install
 ```
+
 ipt2socks 默认安装到 `/usr/local/bin/ipt2socks`，可安装到其它目录，如 `make install DESTDIR=/opt/local/bin`。
 
-**静态链接 libuv**：适用于交叉编译，此方式编译出来的 `ipt2socks` 不依赖任何第三方库，可直接拷贝到目标系统运行：
+
+#### 静态链接 libuv
+
+适用于交叉编译，此方式编译出来的 `ipt2socks` 不依赖任何第三方库，可直接拷贝到目标系统运行：
+
 ```bash
 # 进入某个目录
 cd /opt
@@ -42,56 +62,67 @@ make INCLUDES="-I/opt/libuv/include" LDFLAGS="-L/opt/libuv/lib" && sudo make ins
 ```
 
 ## 如何运行
+
 ```bash
 # -s 指定 socks5 服务器 ip
 # -p 指定 socks5 服务器端口
 ipt2socks -s 127.0.0.1 -p 1080
 ```
+
 > ipt2socks 启动后，配置相应的 iptables 规则即可。这里就不详细介绍了，有兴趣的请戳 [ss-tproxy](https://github.com/zfl9/ss-tproxy)。
 
-**全部参数**
-```bash
-$ ipt2socks --help
-usage: ipt2socks <options...>. the existing options are as follows:
- -s, --server-addr <addr>           socks5 server ip address, <required>
- -p, --server-port <port>           socks5 server port number, <required>
- -b, --listen-addr4 <addr>          listen ipv4 address, default: 127.0.0.1
- -B, --listen-addr6 <addr>          listen ipv6 address, default: ::1
- -l, --listen-port <port>           listen port number, default: 60080
- -j, --thread-nums <num>            number of worker threads, default: 1
- -n, --nofile-limit <num>           set nofile limit, maybe need root priv
- -o, --udp-timeout <sec>            udp socket idle timeout, default: 300
- -c, --cache-size <size>            max size of udp lrucache, default: 256
- -f, --buffer-size <size>           buffer size of tcp socket, default: 8192
- -u, --run-user <user>              run the ipt2socks with the specified user
- -R, --redirect                     use redirect instead of tproxy (for tcp)
- -T, --tcp-only                     listen tcp only, aka: disable udp proxy
- -U, --udp-only                     listen udp only, aka: disable tcp proxy
- -4, --ipv4-only                    listen ipv4 only, aka: disable ipv6 proxy
- -6, --ipv6-only                    listen ipv6 only, aka: disable ipv4 proxy
- -v, --verbose                      print verbose log, default: <disabled>
- -V, --version                      print ipt2socks version number and exit
- -h, --help                         print ipt2socks help information and exit
+### 全部参数
+
+```text
+Usage: ipt2socks <options...>. the existing options are as follows:
+     -c, --config       <file>    config file
+     -s, --server-addr  <addr>    socks5 server ip address, <required>
+     -p, --server-port  <port>    socks5 server port number, <required>
+     -l, --listen-addr4 <addr>    listen ipv4 address, default: 127.0.0.1
+     -L, --listen-addr6 <addr>    listen ipv6 address, default: ::1
+     -P, --listen-port  <port>    listen port number, default: 60080
+     -j, --thread       <num>     number of worker threads, default: 1
+     -n, --file-limit   <num>     set nofile limit, may need root privilege
+     -o, --udp-timeout  <sec>     udp socket idle timeout, default: 300
+     -k, --cache-size   <size>    max size of udp lruc ache, default: 256
+     -b, --buffer-size  <size>    buffer size of tcp socket, default: 8192
+     -u, --user         <user>    run the ipt2socks with the specified user
+     -G, --graceful               gracefully close the tcp connection pair
+     -r, --redirect               use redirect instead of tproxy (for tcp)
+     -T, --tcp-only               listen tcp only, aka: disable udp proxy
+     -U, --udp-only               listen udp only, aka: disable tcp proxy
+     -4, --ipv4-only              listen ipv4 only, aka: disable ipv6 proxy
+     -6, --ipv6-only              listen ipv6 only, aka: disable ipv4 proxy
+     -v, --verbose                print verbose log, default: <disabled>
+     -V, --version                print ipt2socks version number and exit
+     -h, --help                   print ipt2socks help information and exit
 ```
-- -s 选项指定 socks5 服务器的监听地址。
-- -p 选项指定 socks5 服务器的监听端口。
-- -b 选项指定 ipt2socks 的 IPv4 监听地址。
-- -B 选项指定 ipt2socks 的 IPv6 监听地址。
-- -l 选项指定 ipt2socks 的透明代理监听端口。
-- -j 选项指定 ipt2socks 的线程数，默认为 1。
-- -n 选项设置 ipt2socks 进程的 nofile 限制值。
-- -o 选项设置 ipt2socks 的 UDP 空闲超时(秒)。
-- -c 选项设置 ipt2socks 的 UDP 缓存最大大小。
-- -f 选项设置 ipt2socks 的 TCP 接收缓冲区大小。
-- -u 选项设置 ipt2socks 的用户ID，`run_as_user`。
-- -R 选项指示 ipt2socks 使用 REDIRECT 而非 TPROXY。
-- -T 选项指示 ipt2socks 仅启用 TCP 透明代理监听端口。
-- -U 选项指示 ipt2socks 仅启用 UDP 透明代理监听端口。
-- -4 选项指示 ipt2socks 仅启用 IPv4 协议栈的透明代理。
-- -6 选项指示 ipt2socks 仅启用 IPv6 协议栈的透明代理。
-- -v 选项指示 ipt2socks 在运行期间打印详细的日志信息。
-- -V 选项打印 ipt2socks 的版本号，然后退出 ipt2socks 进程。
-- -h 选项打印 ipt2socks 的帮助信息，然后退出 ipt2socks 进程。
+
+中文：
+
+```text
+-c 配置文件
+-s 选项指定 socks5 服务器的监听地址
+-p 选项指定 socks5 服务器的监听端口
+-l 选项指定 ipt2socks 的 IPv4 监听地址
+-L 选项指定 ipt2socks 的 IPv6 监听地址
+-P 选项指定 ipt2socks 的透明代理监听端口
+-j 选项指定 ipt2socks 的线程数，默认为 1
+-n 选项设置 ipt2socks 进程的 nofile 限制值
+-o 选项设置 ipt2socks 的 UDP 空闲超时(秒)
+-k 选项设置 ipt2socks 的 UDP 缓存最大大小
+-b 选项设置 ipt2socks 的 TCP 接收缓冲区大小
+-u 选项设置 ipt2socks 的用户ID，`run_as_user`
+-G 选项指示 ipt2socks 优雅关闭 TCP 代理连接对。
+-r 选项指示 ipt2socks 使用 REDIRECT 而非 TPROXY
+-T 选项指示 ipt2socks 仅启用 TCP 透明代理监听端口
+-U 选项指示 ipt2socks 仅启用 UDP 透明代理监听端口
+-4 选项指示 ipt2socks 仅启用 IPv4 协议栈的透明代理
+-6 选项指示 ipt2socks 仅启用 IPv6 协议栈的透明代理
+-v 选项指示 ipt2socks 在运行期间打印详细的日志信息
+-V 选项打印 ipt2socks 的版本号，然后退出 ipt2socks 进程
+-h 选项打印 ipt2socks 的帮助信息，然后退出 ipt2socks 进程
+```
 
 **以普通用户运行 ipt2socks**
 - `sudo setcap cap_net_bind_service,cap_net_admin+ep /usr/local/bin/ipt2socks`
